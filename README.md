@@ -66,7 +66,6 @@ cd path_to_LorBin-BASALT-Extrabinner
 conda activate basalt_env
 # install our in-house version lorbin-basalt-extrabinner
 pip install .
-
 ```
 
 ### Install LorBin via pip from scratch
