@@ -57,9 +57,7 @@ Sequence processing tool:
 
 ### Install In-house Version LorBin via pip from BASALT base environment
 
-> You can install LorBin from pip. After installing Anaconda (or miniconda), first, obtain LorBin:  
-> git clone [https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git](https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git)
-> Then create an environment to run LorBin.
+You can install LorBin from pip. After installing Anaconda (or miniconda), first, obtain LorBin: git clone [https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git](https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git) And download Lorbin based on BASALT enironment.
 
 ```
 cd path_to_LorBin-BASALT-Extrabinner
@@ -69,8 +67,6 @@ pip install .
 ```
 
 ### Install LorBin via pip from scratch
-
-> If you want to run lorbin only
 
 You can install LorBin from pip. After installing Anaconda (or miniconda), first, obtain LorBin:  
 git clone [https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git](https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git)
