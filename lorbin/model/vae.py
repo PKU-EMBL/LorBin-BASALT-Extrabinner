@@ -332,7 +332,13 @@ class VAE(nn.Module):
         epoch_absseloss = 0.0
 
         if epoch in batchsteps:
-            dataloader = DataLoader(dataloader.dataset,batch_size=dataloader.batch_size*2)
+            # dataloader = DataLoader(dataloader.dataset,batch_size=dataloader.batch_size*2)
+            dataloader = DataLoader(
+                dataloader.dataset, 
+                batch_size=dataloader.batch_size*2, 
+                drop_last=True, 
+                shuffle=True
+            )
 
         for depths_in, tnf_in, abundance_in, weights in dataloader:
             depths_in.requires_grad = True

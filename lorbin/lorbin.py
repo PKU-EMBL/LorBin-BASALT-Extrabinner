@@ -92,19 +92,13 @@ def cluster(logger, outdir,fastadir,embeddingdir, bin_length, feature,a):
     if not contig2marker:
         logger.info("no markers")
     contig_dict = utils.process_fasta(fastadir)
-    if bin_length <= 0:
-        bin_length = 50  # 直接设置合理默认值
     labels, keep = bin_cluster(logger, latent, contig2marker, contig_dict, contig_list, contig_all, bin_length, feature, a)
     pd.DataFrame({'label':labels},index=contig_all).to_csv(f'{outdir}/label.csv')
     write_bin(contig_all, labels,contig_dict,f"{outdir}/output_bins",bin_length)
-# 临时定义，避免 NameError
-def generate_cluster(*args, **kwargs):
-    # 返回 False 继续程序，返回 True 则会触发 sys.exit()
-    return False
 
 def mcluster(logger, outdir, fastadir, embeddingdir, bin_length, feature,a):
-    if generate_cluster(logger, outdir, fastadir, embeddingdir):
-        sys.exit()
+    # if generate_cluster(logger, outdir, fastadir, embeddingdir):
+    #     sys.exit()
     df = pd.read_csv(embeddingdir,index_col=0)
     names = df.index
     contig_all = names
@@ -121,8 +115,9 @@ def mcluster(logger, outdir, fastadir, embeddingdir, bin_length, feature,a):
     for i in range(len(nsample)-1):
         latent = embedding[nsample[i]:nsample[i+1]]
         labels, keep = bin_cluster(logger, latent, contig2marker, contig_dict, contig_list, contig_all, bin_length, feature, a)
-        pd.DataFrame({'label':labels},index=contig_all).to_csv(f'{outdir}/label_{samplename[i]}.csv')
-        write_bin(contig_all, labels,contig_dict,f"{output}/output_bins_{samplename[i]}",bin_length)
+        pd.DataFrame({'label':labels},index=contig_all).to_csv(f'{outdir}/label_{samplenames[i]}.csv')
+        # write_bin(contig_all, labels,contig_dict,f"{outdir}/output_bins_{samplenames[i]}",bin_length)
+        write_bin(contig_all, labels,contig_dict,f"{outdir}",bin_length)
 
 
 def msample(names):
@@ -135,7 +130,7 @@ def msample(names):
             samplestart.append(e)
             prefix=sample
             samplename.append(prefix)
-    samplestart.append(e)
+    samplestart.append(e+1)
     return samplestart, samplename
 
 def write_bin(namelist,contig_labels,contig_seqs,output, minfasta):
@@ -175,42 +170,20 @@ def parser_args():
         p.add_argument('--bin_length', default=80000,help='Minimum bin size in bps (Default: 80000)')
     for p in [ bin_mode, generate_data]:
         p.add_argument('-b','--bam',type=str, nargs='+',help='Path to the input BAM(.bam) file. ',required=True,default=None)
-        p.add_argument(
-            '--num_process',
-            type=int,
-            default=10,
-            help='Number of threads used (default: 10)'
-        )
+        p.add_argument('--num_process', default=10, help=' Number of threads used (default: 10)')
     for p in [bin_mode, cluster]:
         p.add_argument('--evaluation',type=str, default="no_markers", help='Evaluation model used(no_markers, markers110, markers35, default: nomarkers')
         p.add_argument('-a','--akeep',default=0.6, help='The cut-off parameters of re-clustering decision model(0~1, default:0.6)')
         p.add_argument('--multi',action='store_true', default=False, help='Cluster uses more samples')
-    # ===== add training args for bin mode =====
-    bin_mode.add_argument('--epoch','-n', type=int, default=300,
-                        help='training epoch (default: 300)')
-    bin_mode.add_argument('--batch_size', type=int, default=128,
-                        help='batch size (default: 128)')
-    bin_mode.add_argument('--batchsteps', nargs='+', default=[30, 100],
-                        help='batchsteps (default: 30 100)')
-    bin_mode.add_argument('--lrate','-l', type=float, default=0.001,
-                         help='learning rate (default: 0.001)')
-    bin_mode.add_argument('--cuda', action='store_true',
-                        help='whether use cuda')
-
     cluster.add_argument('--embeddingdir','-e',default=None, help='The path of embedding csv file used in clustering')
     cluster.add_argument('--data',default=None, help='The path of training data')
-    cluster.add_argument(
-        '--num_process',
-        type=int,
-        default=10,
-        help='Number of threads used (default: 10)'
-    )
+    cluster.add_argument('--num_process', default=10, help=' Number of threads used (default: 10)')
     cluster.add_argument('--cuda', help = 'whether use cuda', required=False, action='store_true')
     cluster.add_argument('--batch_size', help = 'batch size (default: 64)', default=128)
     cluster.add_argument('--epoch','-n', help='training epoch (default: 300)', default=300)
     cluster.add_argument('--lrate','-l',help='learning rate (default: 0.001)', default=0.001)
     cluster.add_argument('--batchsteps', help = 'batchseteps (default: 30, 60, 120)', default=[30, 100], nargs='+')
-
+    bin_mode.add_argument('--epoch','-n', help='training epoch (default: 300)', default=100)
     train.add_argument('--data',type=str, help='The path of training data', required=True)
     train.add_argument('-o','--output',type=str,help='Output directory (will be created if non-existent)',required=True, default=None)
     train.add_argument('--epoch','-n', help='training epoch (default: 300)', default=300)
