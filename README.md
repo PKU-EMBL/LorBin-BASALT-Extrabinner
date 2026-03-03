@@ -19,15 +19,15 @@ LorBin is a deep learning-based binner suitable for contigs assembled from long 
 
 ## <a name="requirements"></a>System Requirements
 
-LorBin is developed in Python 3.10 with modules and external tools.
+In-house version LorBin is developed in Python 3.12 with modules and external tools.
 
 ### Hardware requirements
 
-LorBin requires only a standard computer with enough RAM to support the in-memory operations.
+In-house version LorBin requires only a standard computer with enough RAM to support the in-memory operations.
 
 ### OS requirements
 
-LorBin is supported and tested in Linux systems.
+In-house version LorBin is supported and tested in Linux systems.
 
 ### Required dependencies
 
@@ -55,7 +55,7 @@ Sequence processing tool:
 
 ## <a name="install"></a>Installation
 
-### Install LorBin via pip
+### Install In-house Version LorBin via pip
 
 You can install LorBin from pip. After installing Anaconda (or miniconda), first, obtain LorBin:  
 git clone [https://github.com/LorBin.git](https://github.com/LorMeBioAI/LorBin.git)
@@ -72,7 +72,7 @@ pip install .
 If installing the environment through the configuration file is too slow, or you need an environment that is more suitable for your hardware, you can install it step by step.
 
 ```
-create -n lorbin_env python=3.10
+create -n lorbin_env python=3.12
 conda activate lorbin_env
 
 conda install biopython=1.78 hmmer prodigal samtools bedtools -c bioconda
