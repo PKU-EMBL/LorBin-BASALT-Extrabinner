@@ -33,15 +33,11 @@ In-house version LorBin is supported and tested in Linux systems.
 
 python modules:
 
-- biopython=1.78
-- pytorch=1.11.0
-- setuptools=65.5.0
-- torchvision=0.12.0
-- torchaudio=0.11.0
-- numpy=1.23.3
-- pip=22.2.2
+- biopython=1.85
+- torch=2.5.1
+- numpy=1.26.4
 - pandas=2.2.2
-- scikit-learn=1.1.2
+- scikit-learn=1.5.2
 - scipy=1.13.1
 - joblib=1.4.2
 
@@ -70,30 +66,44 @@ pip install .
 
 You can install LorBin from pip. After installing Anaconda (or miniconda), first, obtain LorBin:  
 git clone [https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git](https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git)
-Then create an environment to run LorBin.
+Then create a Python 3.12 environment to run LorBin.
+
+The old dependency pins in this repository (for example `biopython=1.78`, `numpy=1.23.3`, `scikit-learn=1.1.2`, and `pytorch=1.11.0`) do not provide Python 3.12 builds, which is why `LibMambaUnsatisfiableError` appears during installation. The environment file now installs the Python 3.12-compatible non-PyTorch dependencies first, and `torch` should be installed separately according to your platform.
+For other CUDA versions, please choose the matching install command from the official PyTorch installation guide.
 
 ```
 cd path_to_LorBin-BASALT-Extrabinner
 conda env create -f lorbin_env.yaml
 conda activate lorbin_env
+
+# install torch separately
+# Linux CPU only
+pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+# Linux + CUDA 12.1
+# pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
+# macOS
+# pip install torch==2.5.1
+
 # install our in-house version lorbin-basalt-extrabinner
 pip install .
 ```
 
-If installing the environment through the configuration file is too slow, or you need an environment that is more suitable for your hardware, you can install it step by step.
+If installing the environment through the configuration file is too slow, or you need an environment that is more suitable for your hardware, you can install it step by step with Python 3.12.
 
 ```
-create -n lorbin_env python=3.12
+conda create -n lorbin_env -c conda-forge -c bioconda -c defaults python=3.12 minimap2 hmmer prodigal samtools bedtools pip
 conda activate lorbin_env
 
-conda install biopython=1.78 hmmer prodigal samtools bedtools -c bioconda
+pip install biopython==1.85 numpy==1.26.4 pandas==2.2.2 scikit-learn==1.5.2 scipy==1.13.1 joblib==1.4.2
 
-# CUDA 11.3 If you use GPUs, you had better check your version of CUDA and browse https://pytorch.org/ to choose which pytorch you need.
-conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
 # CPU Only
-conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cpuonly -c pytorch
+pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+# Linux + CUDA 12.1
+# pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
+# macOS
+# pip install torch==2.5.1
 
-pip install numpy==1.23.3 scikit-learn=1.1.2 scipy=1.13.1 pandas=2.2.2 joblib=1.4.2
+pip install .
 ```
 
 ## <a name="demo"></a>A test dataset to demo LorBin
