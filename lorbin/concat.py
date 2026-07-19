@@ -1,6 +1,5 @@
 from Bio import SeqIO
 import argparse
-import pandas as pd
 
 if __name__=="__main__":
     parser= argparse.ArgumentParser(description="""Creates the input FASTA file for LorBin.

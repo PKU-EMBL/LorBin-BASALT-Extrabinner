@@ -3,7 +3,6 @@ import subprocess
 import contextlib
 import sys
 import shutil
-import logging
 
 def run_prodigal(fasta_path, num_process, output):
     from .fasta import fasta_iter
@@ -49,15 +48,16 @@ def run_prodigal(fasta_path, num_process, output):
         for p in process:
             p.wait()
 
-    except:
+    except Exception:
         sys.stderr.write(
-            f"Error: Running prodigal fail\n")
+            f"Error: Running prodigal failed\n")
         sys.exit(1)
 
     contig_output = os.path.join(output, 'contigs.faa')
     with open(contig_output, 'w') as f:
         for index in range(next_ix):
-            f.write(open(os.path.join(output, 'contig_{}.faa'.format(index)), 'r').read())
+            with open(os.path.join(output, 'contig_{}.faa'.format(index)), 'r') as fin:
+                f.write(fin.read())
     return contig_output
 
 
@@ -79,7 +79,7 @@ def run_fraggenescan(fasta_path, num_process, output):
                  ],
                 stdout=frag_out_log,
             )
-    except:
+    except Exception:
         sys.stderr.write(
             f"Error: Running fraggenescan failed\n")
         sys.exit(1)
@@ -88,7 +88,7 @@ def run_fraggenescan(fasta_path, num_process, output):
 
 
 def run_orffinder(fasta_path, num_process, tdir, orf_finder, prodigal_output_faa):
-    '''Run ORF finder (depending on the value or the orf_finder argument'''
+    '''Run ORF finder (depending on the value of the orf_finder argument)'''
     if prodigal_output_faa is not None:
         oname = os.path.join(tdir, 'orfs.faa')
         shutil.copyfile(prodigal_output_faa, oname)

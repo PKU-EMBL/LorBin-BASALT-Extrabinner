@@ -1,7 +1,6 @@
 import torch
 from torch import nn
 from typing import Optional, IO, Union
-from pathlib import Path
 from torch import Tensor
 from torch.nn.functional import softmax
 from math import log
@@ -10,7 +9,6 @@ from torch.utils.data import DataLoader
 from torch.optim import Adam
 import numpy as np
 import datetime
-import logging
 
 def zscore(array: np.ndarray, axis: Optional[int] = None) -> np.ndarray:
     """Calculates zscore for an array. A cheap copy of scipy.stats.zscore.
@@ -429,7 +427,6 @@ class VAE(nn.Module):
 
                 latent[row : row + len(mu)] = mu
                 row += len(mu)
-        print(row,length)
         assert row == length
         return latent
 
@@ -514,7 +511,7 @@ class VAE(nn.Module):
             raise ValueError(f"Learning rate must be positive, not {lrate}")
 
         if nepochs < 1:
-            raise ValueError("Minimum 1 epoch, not {nepochs}")
+            raise ValueError(f"Minimum 1 epoch, not {nepochs}")
 
         if batchsteps is None:
             batchsteps_set: set[int] = set()
@@ -545,7 +542,7 @@ class VAE(nn.Module):
         logger.info(f"\tAlpha:{self.alpha}")
         logger.info(f"\tBeta:{self.beta}")
         logger.info(f"\tDropout:{self.dropout}")
-        logger.info(f"\tN hidden:f{ ', '.join(map(str, self.nhiddens))}")
+        logger.info(f"\tN hidden:{ ', '.join(map(str, self.nhiddens))}")
         logger.info(f"\tN latent:{self.nlatent}")
         logger.info("\n\tTraining properties:")
         logger.info(f"\tN epochs:{nepochs}")
@@ -567,7 +564,7 @@ class VAE(nn.Module):
         # Save weights - Lord forgive me, for I have sinned when catching all exceptions
         try:
             self.save(f"{outdir}/model.pt")
-        except:
+        except Exception:
             pass
 
         return None

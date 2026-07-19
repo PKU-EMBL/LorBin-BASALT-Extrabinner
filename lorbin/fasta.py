@@ -7,7 +7,7 @@ def fasta_iter(fname, full_header=False):
         Filename.
             If it ends with .gz, gzip format is assumed
             If .bz2 then bzip2 format is assumed
-            if .xz, then lzma format is assumerd
+            if .xz, then lzma format is assumed
     full_header : boolean (optional)
         If True, yields the full header. Otherwise (the default), only the
         first word

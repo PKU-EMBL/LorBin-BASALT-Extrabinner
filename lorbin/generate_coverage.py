@@ -54,7 +54,6 @@ def generate_cov(bam_file, bam_index, out, logger, contig_threshold=1000):
     threshold: threshold of contigs that will be binned
     sep: separator for multi-sample binning
     """
-    import numpy as np
     logger.debug('Processing `{}`'.format(bam_file))
     bam_name = os.path.split(bam_file)[-1] + '_{}'.format(bam_index)
 

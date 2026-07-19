@@ -1,16 +1,13 @@
 from collections import defaultdict
 import pandas as pd
 import torch
-from Bio import SeqIO
 from sklearn.neighbors import kneighbors_graph
 import math
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from .utils import get_marker, process_fasta
 from .model.KeepModel import KeepModel
 from .model.EvaluationModel import EvaluationModel
 import numpy as np
 from sklearn.cluster import Birch, DBSCAN
-import logging
 import os
 
 
@@ -106,7 +103,6 @@ def get_bin_best_markers(keepmodel,evaluationmodel, vectorizer, tfidf_transforme
 
 
 def bin_cluster(logger, latent, contig2marker, contig_dict, contig_list, contig_all, minfasta, feature="no_markers", a=0.6):
-    result_dict = {}
     # create BIRCH
     min_k_1 = min(200, latent.shape[0] - 1)
     dist_matrix = kneighbors_graph(
@@ -156,13 +152,10 @@ def bin_cluster(logger, latent, contig2marker, contig_dict, contig_list, contig_
     for e,eps_value in enumerate(eps_p2):
         if eps_value<0.001:
             continue
-        if e<5:
-            minsample=5
-        else:
-            minsample=5
+        minsample=5
         dbscan = DBSCAN(eps=eps_value, min_samples=minsample, n_jobs=8, metric='precomputed')
         dbscan.fit(dist_matrix, sample_weight=length_weight)
-        # predict the labal
+        # predict the label
         labels = dbscan.labels_
         res_temp = defaultdict(list)
         for label, name in zip(labels, contig_list_index):
@@ -174,14 +167,10 @@ def bin_cluster(logger, latent, contig2marker, contig_dict, contig_list, contig_
     for e,eps_value in enumerate(eps_cos):
         if eps_value<0.001:
             continue
-        if e<5:
-            minsample=5
-        else:
-            minsample=5
+        minsample=5
         dbscan = DBSCAN(eps=eps_value, min_samples=minsample, n_jobs=8, metric='precomputed')
         dbscan.fit(dist_matrix_cos, sample_weight=length_weight)
         labels = dbscan.labels_
-        result_dict[eps_value] = labels.tolist()
 
         res_temp = defaultdict(list)
         for label, name in zip(labels, contig_list_index):
@@ -192,7 +181,6 @@ def bin_cluster(logger, latent, contig2marker, contig_dict, contig_list, contig_
     resultpool = list(map(list, unique_resultpool))
     modeldir = os.path.split(__file__)[0]
     extracted = []
-    all_extracted=[]
     if feature=="no_markers":
         model1 = EvaluationModel(3)
         model1.load_state_dict(torch.load(f'{modeldir}/model/huigui_weights.pt'))
@@ -216,7 +204,7 @@ def bin_cluster(logger, latent, contig2marker, contig_dict, contig_list, contig_
         vocabulary = list(vocabulary_df.iloc[:, 0])
         vectorizer = CountVectorizer(vocabulary=vocabulary, lowercase=False)
         tfidf_transformer = TfidfTransformer()
-    logger.info("load cluster quality asssement model and clustering decision model")
+    logger.info("load cluster quality assessment model and clustering decision model")
     keep_label=[]
     keep_count=0
     logger.info("cluster")
@@ -236,7 +224,6 @@ def bin_cluster(logger, latent, contig2marker, contig_dict, contig_list, contig_
             extracted.append(max_bin.copy())
         else:
             keep_count+=1
-        all_extracted.append(max_bin.copy())
         keep_label.append(keep)
         for temp in max_bin.copy():
             for i, result in enumerate(resultpool):
@@ -244,22 +231,10 @@ def bin_cluster(logger, latent, contig2marker, contig_dict, contig_list, contig_
                     result.remove(temp)
 
     contig2ix = {}
-    label_index=0
     for i, cs in enumerate(extracted):
         for c in cs:
             contig2ix[contig_all[c]] = i
-        label_index=i+1
     contig_labels = [contig2ix.get(c, -1) for c in contig_all]
-    contig2ix_={}
-    repeat=[]
-    for i, cs in enumerate(all_extracted):
-        for c in cs:
-            if contig2ix_.get(contig_all[c], -1)==-1:
-                contig2ix_[contig_all[c]] = i
-            else:
-                repeat.append(c)
-        label_index=i+1
-    contig_labels_ = [contig2ix_.get(c, -1) for c in contig_all]
     logger.info('start recluster')
     recluster_index = [index for index, value in enumerate(contig_labels) if value == -1]
     recluster_latent = latent[recluster_index]

@@ -34,10 +34,10 @@ def check_cluster(logger, outdir, fastadir, embeddingdir,data, feature, a):
     if data!=None and not os.path.exists(data):
         return False
     if feature not in ['no_markers', 'markers110', 'markers35']:
-        logger.info("not find th evaluation model, feature should be 'no_markers', 'markers110', 'markers35'.")
+        logger.info("cannot find the evaluation model, feature should be 'no_markers', 'markers110', 'markers35'.")
         return False
     if a>1 or a<0:
-        logger.info('parameter -a must between 0 and 1')
+        logger.info('parameter -a must be between 0 and 1')
         return False
     if not os.path.exists(outdir):
         os.makedirs(outdir)

@@ -1,8 +1,6 @@
 from .fasta import fasta_iter
 import subprocess
-import multiprocessing
 import sys
-import contextlib
 import tempfile
 import os
 
@@ -61,7 +59,9 @@ def generate_markers(fasta_path, binned_length, num_process, output = None, orf_
     with tempfile.TemporaryDirectory() as tdir:
         if output is not None:
             if os.path.exists(os.path.join(output, 'markers.hmmout')):
-                return get_marker(os.path.join(output, 'markers.hmmout'), fasta_path, binned_length, orf_finder=orf_finder)
+                return get_marker(os.path.join(output, 'markers.hmmout'),
+                                  contig_names=[h for h, _ in fasta_iter(fasta_path)],
+                                  fasta_path=fasta_path, min_contig_len=binned_length, orf_finder=orf_finder)
             else:
                 os.makedirs(output, exist_ok=True)
                 target_dir = output
@@ -84,14 +84,16 @@ def generate_markers(fasta_path, binned_length, num_process, output = None, orf_
                      ],
                     stdout=hmm_out_log,
                 )
-        except:
+        except Exception:
             if os.path.exists(hmm_output):
                 os.remove(hmm_output)
             sys.stderr.write(
-                f"Error: Running hmmsearch fail\n")
+                f"Error: Running hmmsearch failed\n")
             sys.exit(1)
 
-        return get_marker(hmm_output, fasta_path, binned_length, orf_finder=orf_finder)
+        return get_marker(hmm_output,
+                          contig_names=[h for h, _ in fasta_iter(fasta_path)],
+                          fasta_path=fasta_path, min_contig_len=binned_length, orf_finder=orf_finder)
 
 
 def process_fasta(fasta_path):
@@ -100,13 +102,9 @@ def process_fasta(fasta_path):
 
     contigs: dictionary ID -> contig sequence
     """
-    whole_contig_bp = 0
-    contig_length_list = []
     contig_dict = {}
 
     for h, seq in fasta_iter(fasta_path):
-        contig_length_list.append(len(seq))
-        whole_contig_bp += len(seq)
         contig_dict[h] = seq
 
     return contig_dict
