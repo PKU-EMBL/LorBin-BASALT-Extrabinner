@@ -1,21 +1,24 @@
 # LorBin-BASALT-Extrabinner
 
-This is a in-house version Lorbin implementation for BASALT Extrabinner.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13864645.svg)](https://doi.org/10.5281/zenodo.13864645)
+
+This is an in-house version of the LorBin implementation for BASALT Extrabinner.
 
 GitHub repository for the manuscript "LorBin: Efficient binning of long-read metagenomes by multiscale adaptive clustering and evaluation".
-The code is also citable by obtaining a DOI for the Github repository in order to provide a permanent reference to the version of the code used in this study and improve reproducibility( https://doi.org/10.5281/zenodo.13864645 )
+The code is also citable by obtaining a DOI for the GitHub repository in order to provide a permanent reference to the version of the code used in this study and improve reproducibility (https://doi.org/10.5281/zenodo.13864645).
 
 - [Overview](#overview)
 - [System Requirements](#requirements)
-- [Install LorBin via source code](#install)
+- [Installation](#install)
 - [A test dataset to demo LorBin](#demo)
 - [Preprocessing](#preprocessing)
 - [How to run LorBin](#runlorbin)
-- [References](#References)
+- [References](#references)
+- [License](#license)
 
 ## <a name="overview"></a>Overview
 
-LorBin is a deep learning-based binner suitable for contigs assembled from long reads. The framework of LorBin is mainly divided into the following steps: 1) VAE embedding: computes the k-mer frequencies and abundance and uses a self-supervised variational autoencoder to extract the embedded features; 2) first-stage clustering(clustering): uses the multiscale adaptive DBSCAN with a clustering bin quality model to generate bins and then uses a reclustering decision model to determine whether the bins are retained; 3) second-stage clustering (reclustering): generates bins in a similar way as the first-stage clustering by multiscale adaptive BIRCH using contigs failed to be clustered; and 4) bin pooling: pools the bins of the two stages as the final binning result.
+LorBin is a deep learning-based binner suitable for contigs assembled from long reads. The framework of LorBin is mainly divided into the following steps: 1) VAE embedding: computes the k-mer frequencies and abundance and uses a self-supervised variational autoencoder to extract the embedded features; 2) first-stage clustering (clustering): uses the multiscale adaptive DBSCAN with a clustering bin quality model to generate bins and then uses a reclustering decision model to determine whether the bins are retained; 3) second-stage clustering (reclustering): generates bins in a similar way as the first-stage clustering by multiscale adaptive BIRCH using contigs failed to be clustered; and 4) bin pooling: pools the bins of the two stages as the final binning result.
 
 ## <a name="requirements"></a>System Requirements
 
@@ -31,7 +34,7 @@ In-house version LorBin is supported and tested in Linux systems.
 
 ### Required dependencies
 
-python modules:
+Python modules:
 
 - biopython=1.85
 - torch=2.5.1
@@ -41,7 +44,7 @@ python modules:
 - scipy=1.13.1
 - joblib=1.4.2
 
-Sequence processing tool:
+Sequence processing tools:
 
 - minimap2=2.24-r1122
 - samtools=1.15.1
@@ -53,10 +56,11 @@ Sequence processing tool:
 
 ### Install In-house Version LorBin via pip from BASALT base environment
 
-You can install LorBin from pip. After installing Anaconda (or miniconda), first, obtain LorBin: git clone [https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git](https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git) And download Lorbin based on BASALT enironment.
+You can install LorBin from pip. After installing Anaconda (or miniconda), first obtain LorBin and install it based on the BASALT environment:
 
-```
-cd path_to_LorBin-BASALT-Extrabinner
+```bash
+git clone https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git
+cd LorBin-BASALT-Extrabinner
 conda activate basalt_env
 # install our in-house version lorbin-basalt-extrabinner
 pip install .
@@ -64,15 +68,19 @@ pip install .
 
 ### Install LorBin via pip from scratch
 
-You can install LorBin from pip. After installing Anaconda (or miniconda), first, obtain LorBin:  
-git clone [https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git](https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git)
+You can install LorBin from pip. After installing Anaconda (or miniconda), first obtain LorBin:
+
+```bash
+git clone https://github.com/PKU-EMBL/LorBin-BASALT-Extrabinner.git
+```
+
 Then create a Python 3.12 environment to run LorBin.
 
 The old dependency pins in this repository (for example `biopython=1.78`, `numpy=1.23.3`, `scikit-learn=1.1.2`, and `pytorch=1.11.0`) do not provide Python 3.12 builds, which is why `LibMambaUnsatisfiableError` appears during installation. The environment file now installs the Python 3.12-compatible non-PyTorch dependencies first, and `torch` should be installed separately according to your platform.
 For other CUDA versions, please choose the matching install command from the official PyTorch installation guide.
 
-```
-cd path_to_LorBin-BASALT-Extrabinner
+```bash
+cd LorBin-BASALT-Extrabinner
 conda env create -f lorbin_env.yaml
 conda activate lorbin_env
 
@@ -90,7 +98,7 @@ pip install .
 
 If installing the environment through the configuration file is too slow, or you need an environment that is more suitable for your hardware, you can install it step by step with Python 3.12.
 
-```
+```bash
 conda create -n lorbin_env -c conda-forge -c bioconda -c defaults python=3.12 minimap2 hmmer prodigal samtools bedtools pip
 conda activate lorbin_env
 
@@ -108,43 +116,43 @@ pip install .
 
 ## <a name="demo"></a>A test dataset to demo LorBin
 
-We provide a small dataset to demo and test the software. The contigs were assembled by hifiasm.  
-Concatenate the input single FASTA file and create BAM files
-The inputs for LorBin include contigs and BAM files.You cat get a test dataset at https://zenodo.org/records/13883404
+We provide a small dataset to demo and test the software. The contigs were assembled by hifiasm.
+The inputs for LorBin include contigs and BAM files. You can get a test dataset at https://zenodo.org/records/13883404.
+
 Run LorBin on the test dataset:
 
-```angular2html
+```bash
 LorBin bin --fa test/test.fna -b test.sort.bam -o test_o
 ```
 
-## <a name="preprocess"></a>Preprocessing
+## <a name="preprocessing"></a>Preprocessing
 
 The preprocessing steps aim to obtain a single FASTA file and generate bam files as input to our program.
 
 ### Concatenate the input contigs to a single FASTA file
 
-If you have several FASTA files and want to bin them at once, you can use concat.py to concatenate the input contigs to a single FASTA file.
+If you have several FASTA files and want to bin them at once, you can use the `concat` subcommand to concatenate the input contigs to a single FASTA file.
 
-```angular2html
+```bash
 LorBin concat -fa test1.fna test2.fna -o test.fna
 ```
 
-Your contig headers must be unique. Then, concat.py will use '-' to connect the sample index and contigs header.
+Your contig headers must be unique. Then, `concat` will use '-' to connect the sample index and contigs header.
 
 ### Generate bam files
 
-```
+```bash
 minimap2 -a test/test.fna test/test1_raw.fq | samtools view -h -b -S | samtools view -b -F 4 | samtools sort -@ 20 > test1.mapped.sorted.bam
 minimap2 -a test/test.fna test/test2_raw.fq | samtools view -h -b -S | samtools view -b -F 4 | samtools sort -@ 20 > test2.mapped.sorted.bam
 ```
 
-## <a name="runlorbin"></a> na How to run LorBin
+## <a name="runlorbin"></a>How to run LorBin
 
 ### Run LorBin
 
 #### Activate the environment
 
-```
+```bash
 conda activate lorbin_env
 ```
 
@@ -152,17 +160,17 @@ conda activate lorbin_env
 
 You can use subcommand 'bin' to bin the contigs.
 
-```angular2html
+```bash
 LorBin bin -o outputdir -fa test.fna -b test1.mapped.sorted.bam test2.mapped.sorted.bam --multi
 ```
 
 If you only want to use LorBin in single mode,
 
-```angular2html
+```bash
 LorBin bin -o outputdir -fa test.fna -b test.mapped.sorted.bam
 ```
 
-```angular2html
+```text
 usage: LorBin bin [-h] -o OUTPUT -fa FASTA [--bin_length BIN_LENGTH] -b BAM [BAM ...] [--num_process NUM_PROCESS] [--evaluation EVALUATION] [-a AKEEP] [--multi]
 
 options:
@@ -178,7 +186,7 @@ options:
   --num_process NUM_PROCESS
                         Number of threads used (default: 10)
   --evaluation EVALUATION
-                        Evaluation model used(no_markers, markers110, markers35, default: nomarkers
+                        Evaluation model used(no_markers, markers110, markers35, default: no_markers)
   -a AKEEP, --akeep AKEEP
                         The cut-off parameters of re-clustering decision model(0~1, default:0.6)
   --multi               Cluster uses more samples
@@ -188,11 +196,11 @@ options:
 
 If you only need the kmer and abundance data, you can use subcommand 'generate_data'.
 
-```angular2html
-LorBin generate_data -o outputdir -fa path_to_all_contis -b test1.mapped.sorted.bam test2.mapped.sorted.bam
+```bash
+LorBin generate_data -o outputdir -fa path_to_all_contigs -b test1.mapped.sorted.bam test2.mapped.sorted.bam
 ```
 
-```angular2html
+```text
 usage: LorBin generate_data [-h] -o OUTPUT -fa FASTA [--bin_length BIN_LENGTH] -b BAM [BAM ...] [--num_process NUM_PROCESS]
 
 options:
@@ -209,13 +217,13 @@ options:
                         Number of threads used (default: 10)
 ```
 
-If you want to train your model more finely, you can use subcommand 'train'
+If you want to train your model more finely, you can use subcommand 'train'.
 
-```angular2html
+```bash
 LorBin train --data test/data.csv -o outputdir
 ```
 
-```angular2html
+```text
 usage: LorBin train [-h] --data DATA -o OUTPUT [--epoch EPOCH] [--lrate LRATE] [--batch_size BATCH_SIZE] [--batchsteps BATCHSTEPS [BATCHSTEPS ...]]
 
 options:
@@ -230,18 +238,18 @@ options:
   --batch_size BATCH_SIZE
                         batch size (default: 64)
   --batchsteps BATCHSTEPS [BATCHSTEPS ...]
-                        batchseteps (default: 30, 60, 120)
+                        batchsteps (default: 30, 60, 120)
 ```
 
 ### Only cluster used embedding.csv
 
 If you have the embedded features of contigs and only want to use the two-stage clustering to bin, you can use subcommand 'cluster' to get the binning result. Note that the embedded features should be stored in .csv files and the index should be the contigs header.
 
-```angular2html
+```bash
 LorBin cluster -o outputdir -fa path_to_all_contigs --embedding path/embedding.csv
 ```
 
-```angular2html
+```text
 usage: LorBin cluster [-h] -o OUTPUT -fa FASTA [--bin_length BIN_LENGTH] [--evaluation EVALUATION] [-a AKEEP] [--multi] --embeddingdir EMBEDDINGDIR [--num_process NUM_PROCESS]
 
 options:
@@ -253,7 +261,7 @@ options:
   --bin_length BIN_LENGTH
                         Minimum bin size in bps (Default: 80000)
   --evaluation EVALUATION
-                        Evaluation model used(no_markers, markers110, markers35, default: nomarkers
+                        Evaluation model used(no_markers, markers110, markers35, default: no_markers)
   -a AKEEP, --akeep AKEEP
                         The cut-off parameters of re-clustering decision model(0~1, default:0.6)
   --multi               Cluster uses more samples
@@ -263,7 +271,7 @@ options:
                         Number of threads used (default: 10)
 ```
 
-## <a name='References'></a>Reference
+## <a name="references"></a>References
 
 [1] Pan, S., Zhao, X.-M. & Coelho, L. P. SemiBin2: self-supervised contrastive learning leads to better MAGs for short- and long-read sequencing. Bioinformatics 39, i21–i29 (2023).
 
@@ -272,3 +280,7 @@ options:
 [3] Wang, Z. et al. Effective binning of metagenomic contigs using contrastive multi-view representation learning. Nat Commun 15, 585 (2024).
 
 [4] Qiu, Z. et al. BASALT refines binning from metagenomic data and increases resolution of genome-resolved metagenomic analysis. Nature Communications 15, 2179 (2024).
+
+## <a name="license"></a>License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
